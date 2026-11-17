@@ -1,0 +1,108 @@
+---
+import { SITE_TITLE, SITE_DESCRIPTION, NAV } from '@/consts';
+import { withBase } from '@/lib/url';
+import Nav from '@/components/Nav.astro';
+import '@/styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  canonical?: string;
+}
+
+const { title, description = SITE_DESCRIPTION, canonical } = Astro.props;
+const pageTitle = title ? `${title} · ${SITE_TITLE}` : SITE_TITLE;
+const canonicalUrl = canonical ?? new URL(Astro.url.pathname, Astro.site).toString();
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={withBase('/og-default.jpg')} />
+
+    <!-- RSS -->
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={SITE_TITLE}
+      href={withBase('/rss.xml')}
+    />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
+
+    <!-- 暗色模式首屏同步脚本：防止闪白 -->
+    <script is:inline>
+      (function () {
+        try {
+          const saved = localStorage.getItem('theme');
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          const theme = saved || (prefersDark ? 'dark' : 'light');
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch (e) {
+          /* ignore */
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <Nav />
+      </div>
+    </header>
+
+    <main class="container">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>
+          © {new Date().getFullYear()} {SITE_TITLE} ·
+          <a href={withBase('/rss.xml')}>RSS</a> ·
+          由 <a href="https://astro.build" target="_blank" rel="noopener">Astro</a> 驱动
+        </p>
+      </div>
+    </footer>
+
+    <!-- 主题切换逻辑 -->
+    <script>
+      const toggleBtn = document.querySelector<HTMLButtonElement>('.theme-toggle');
+      const html = document.documentElement;
+
+      function updateLabel() {
+        if (!toggleBtn) return;
+        const isDark = html.getAttribute('data-theme') === 'dark';
+        toggleBtn.textContent = isDark ? '☀️ 亮色' : '🌙 暗色';
+        toggleBtn.setAttribute('aria-label', isDark ? '切换到亮色模式' : '切换到暗色模式');
+      }
+
+      toggleBtn?.addEventListener('click', () => {
+        const current = html.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', next);
+        try {
+          localStorage.setItem('theme', next);
+        } catch (e) {
+          /* ignore */
+        }
+        updateLabel();
+      });
+
+      updateLabel();
+    </script>
+  </body>
+</html>

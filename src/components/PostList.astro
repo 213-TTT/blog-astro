@@ -1,0 +1,44 @@
+---
+import { withBase } from '@/lib/url';
+import { formatDate } from '@/lib/posts';
+import type { Post } from '@/lib/posts';
+
+interface Props {
+  posts: Post[];
+}
+
+const { posts } = Astro.props;
+---
+
+{posts.length === 0 ? (
+  <div class="post-empty">
+    <p>还没有文章，<code>npm run new -- "标题"</code> 来写第一篇吧～</p>
+  </div>
+) : (
+  <ul class="post-list">
+    {posts.map((post) => (
+      <li class="post-item">
+        <h2 class="post-item-title">
+          <a href={withBase(`/posts/${post.id}/`)}>{post.data.title}</a>
+        </h2>
+        <div class="post-item-meta">
+          <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
+          {post.data.tags.length > 0 && (
+            <>
+              {' · '}
+              {post.data.tags.map((tag, i) => (
+                <span>
+                  <a href={withBase(`/tags/${tag}/`)}>{tag}</a>
+                  {i < post.data.tags.length - 1 ? ', ' : ''}
+                </span>
+              ))}
+            </>
+          )}
+        </div>
+        {post.data.description && (
+          <p class="post-item-description">{post.data.description}</p>
+        )}
+      </li>
+    ))}
+  </ul>
+)}

@@ -1,0 +1,14 @@
+---
+import BaseLayout from '@/components/BaseLayout.astro';
+import PostList from '@/components/PostList.astro';
+import { getPublishedPosts } from '@/lib/posts';
+import { SITE_DESCRIPTION } from '@/consts';
+
+const posts = await getPublishedPosts();
+---
+
+<BaseLayout description={SITE_DESCRIPTION}>
+  <section>
+    <PostList posts={posts} />
+  </section>
+</BaseLayout>

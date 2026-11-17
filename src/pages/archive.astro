@@ -1,0 +1,29 @@
+---
+import BaseLayout from '@/components/BaseLayout.astro';
+import { getPostsByYear, formatDate } from '@/lib/posts';
+import { withBase } from '@/lib/url';
+
+const yearMap = await getPostsByYear();
+const years = Array.from(yearMap.keys()).sort((a, b) => b - a);
+---
+
+<BaseLayout title="归档" description="按时间归档所有文章">
+  <h1>归档</h1>
+  {years.map((year) => (
+    <section>
+      <h2 class="archive-year">{year}</h2>
+      <ul class="archive-list">
+        {yearMap.get(year)!.map((post) => (
+          <li class="archive-item">
+            <a href={withBase(`/posts/${post.id}/`)} class="archive-item-title">
+              {post.data.title}
+            </a>
+            <time class="archive-item-date" datetime={post.data.date.toISOString()}>
+              {formatDate(post.data.date)}
+            </time>
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
+</BaseLayout>

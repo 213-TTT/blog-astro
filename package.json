@@ -1,0 +1,19 @@
+{
+  "name": "featon-blog",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Featon 的个人博客，基于 Astro 构建",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "new": "node scripts/new-post.mjs"
+  },
+  "dependencies": {
+    "@astrojs/rss": "^4.0.11",
+    "@astrojs/sitemap": "^3.2.1",
+    "astro": "^5.2.0"
+  }
+}

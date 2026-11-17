@@ -1,0 +1,66 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import { withBase } from '@/lib/url';
+import { formatDate } from '@/lib/posts';
+import { getAdjacentPosts } from '@/lib/posts';
+import type { Post } from '@/lib/posts';
+
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+const { prev, next } = await getAdjacentPosts(post.id);
+const canonical = new URL(Astro.url.pathname, Astro.site).toString();
+---
+
+<BaseLayout
+  title={post.data.title}
+  description={post.data.description}
+  canonical={canonical}
+>
+  <article>
+    <header class="post-header">
+      <h1 class="post-title">{post.data.title}</h1>
+      <div class="post-meta">
+        <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
+        {post.data.tags.length > 0 && (
+          <>
+            {' · '}
+            {post.data.tags.map((tag, i) => (
+              <span>
+                <a href={withBase(`/tags/${tag}/`)}>{tag}</a>
+                {i < post.data.tags.length - 1 ? ', ' : ''}
+              </span>
+            ))}
+          </>
+        )}
+      </div>
+    </header>
+
+    <div class="post-content">
+      <slot />
+    </div>
+  </article>
+
+  {(prev || next) && (
+    <nav class="post-nav" aria-label="文章导航">
+      {prev ? (
+        <a href={withBase(`/posts/${prev.id}/`)} class="post-nav-item post-nav-prev">
+          <div class="post-nav-label">← 上一篇</div>
+          <div class="post-nav-title">{prev.data.title}</div>
+        </a>
+      ) : (
+        <div></div>
+      )}
+      {next ? (
+        <a href={withBase(`/posts/${next.id}/`)} class="post-nav-item post-nav-next">
+          <div class="post-nav-label">下一篇 →</div>
+          <div class="post-nav-title">{next.data.title}</div>
+        </a>
+      ) : (
+        <div></div>
+      )}
+    </nav>
+  )}
+</BaseLayout>

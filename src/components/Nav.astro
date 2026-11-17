@@ -1,0 +1,32 @@
+---
+import { SITE_TITLE, NAV } from '@/consts';
+import { withBase } from '@/lib/url';
+
+const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
+---
+
+<nav class="nav">
+  <a href={withBase('/')} class="nav-brand">{SITE_TITLE}</a>
+  <ul class="nav-links">
+    {NAV.map((item) => {
+      const itemPath = item.href.replace(/\/$/, '') || '/';
+      const isActive =
+        itemPath === '/'
+          ? currentPath === withBase('/').replace(/\/$/, '')
+          : currentPath.startsWith(withBase(itemPath).replace(/\/$/, ''));
+      return (
+        <li>
+          <a href={withBase(item.href)} aria-current={isActive ? 'page' : undefined}>
+            {item.label}
+          </a>
+        </li>
+      );
+    })}
+    <li>
+      <a href={withBase('/rss.xml')} aria-label="RSS 订阅">RSS</a>
+    </li>
+    <li>
+      <button class="theme-toggle" type="button">🌙 暗色</button>
+    </li>
+  </ul>
+</nav>
